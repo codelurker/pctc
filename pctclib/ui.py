@@ -34,8 +34,6 @@ class UI(object):
             raise urwid.ExitMainLoop
 
     def _wrap_statuses(self, statuses):
-        statuses = [s.replace('&lt;', '<') for s in statuses]
-        statuses = [s.replace('&gt;', '>') for s in statuses]
         textlist = map(urwid.Text, statuses)
         walker = urwid.SimpleListWalker(textlist)
         return urwid.ListBox(walker)

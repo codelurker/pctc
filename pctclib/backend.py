@@ -15,6 +15,8 @@ class Twitter(object):
             text = "%s\n-- %s (@%s)" % (status.text, status.user.name,
                         status.user.screen_name)
             statuses.append(text)
+        statuses = [s.replace('&lt;', '<') for s in statuses]
+        statuses = [s.replace('&gt;', '>') for s in statuses]
         return statuses
 
     def get_updates(self):
@@ -23,6 +25,8 @@ class Twitter(object):
             text = "%s\n-- %s (@%s)" % (status.text, status.user.name,
                         status.user.screen_name)
             statuses.append(text)
+        statuses = [s.replace('&lt;', '<') for s in statuses]
+        statuses = [s.replace('&gt;', '>') for s in statuses]
         return statuses
 
     def post(self, text):
