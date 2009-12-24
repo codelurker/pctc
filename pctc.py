@@ -12,18 +12,27 @@ class UI(object):
         ]
 
     def __init__(self, twitobj):
-        header = urwid.AttrMap(urwid.Text("Welcome to PCTC"), 'header')
+        self.twitobj = twitobj
 
-        replies = self._wrap_statuses(twitobj.get_replies())
-        updates = self._wrap_statuses(twitobj.get_updates())
-        columns = urwid.Columns([replies, updates])
+        header = urwid.Text("Welcome to PCTC. Logged in as %s (@%s)." %
+                                            (twitobj.name, twitobj.username))
+        header = urwid.AttrMap(header, 'header')
 
-        footer = urwid.AttrMap(urwid.Edit("Tweet: "), 'footer')
+        self.replies = self._wrap_statuses(twitobj.get_replies())
+        self.updates = self._wrap_statuses(twitobj.get_updates())
+        columns = urwid.Columns([self.updates, self.replies], dividechars=2)
 
-        frame = urwid.Frame(columns, header, footer, focus_part='footer')
-        wrapped = urwid.AttrMap(frame, 'bg')
+        self.footer = urwid.AttrMap(urwid.Edit("Tweet: "), 'footer')
+
+        self.frame = urwid.Frame(columns, header, self.footer, focus_part='footer')
+        self.focussed = 'footer'
+        wrapped = urwid.AttrMap(self.frame, 'bg')
         loop = urwid.MainLoop(wrapped, UI.palette, unhandled_input=self.handle)
-        loop.run()
+        try:
+            loop.run()
+        except KeyboardInterrupt:
+            print "Keyboard interrupt received, quitting gracefully"
+            raise urwid.ExitMainLoop
 
     def _wrap_statuses(self, statuses):
         textlist = map(urwid.Text, statuses)
@@ -31,17 +40,50 @@ class UI(object):
         return urwid.ListBox(walker)
 
     def handle(self, keys):
-        pass
+        if keys == 'tab':
+            self.change_focus()
+            return
+        if keys == 'enter':
+            self.post()
+            return
+
+    def change_focus(self):
+        if self.focussed == 'footer':
+            self.frame.set_focus('body')
+        elif self.focussed == 'body':
+            self.frame.set_focus('footer')
+
+    def post(self):
+        edit = self.footer.original_widget
+        text = edit.get_edit_text()
+        edit.set_edit_text('')
+        if len(text) < 140:
+            self.twitobj.post(text)
 
 class Twitter(object):
     def __init__(self, uname, pw):
         self.api = twitter.Api(username=uname, password=pw)
+        self.username = uname
+        self.name = self.api.GetUser(uname).name
 
     def get_replies(self):
-        return [s.text for s in self.api.GetReplies()]
+        statuses = []
+        for status in self.api.GetReplies():
+            text = "%s\n-- %s (@%s)" % (status.text, status.user.name,
+                        status.user.screen_name)
+            statuses.append(text)
+        return statuses
 
     def get_updates(self):
-        return [s.text for s in self.api.GetFriendsTimeline()]
+        statuses = []
+        for status in self.api.GetFriendsTimeline():
+            text = "%s\n-- %s (@%s)" % (status.text, status.user.name,
+                        status.user.screen_name)
+            statuses.append(text)
+        return statuses
+
+    def post(self, text):
+        self.api.PostUpdate(text)
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -52,5 +94,5 @@ if __name__ == "__main__":
                 metavar='PW')
     options, args = parser.parse_args()
     if not options.username or not options.password:
-        parser.error("Error: must give username and password")
+        parser.error("must give username and password")
     UI(Twitter(options.username, options.password))
