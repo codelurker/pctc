@@ -12,4 +12,5 @@ parser.add_option('-p', '--password', help='use password PW',
 options, args = parser.parse_args()
 if not options.username or not options.password:
     parser.error("must give username and password")
+
 ui.UI(backend.Twitter(options.username, options.password))
