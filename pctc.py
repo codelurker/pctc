@@ -2,6 +2,7 @@
 # pctc: python curses twitter client
 
 import urwid
+import twitter
 
 class UI(object):
     palette = [
@@ -34,13 +35,22 @@ class UI(object):
 
 class Twitter(object):
     def __init__(self, uname, pw):
-        pass
+        self.api = twitter.Api(username=uname, password=pw)
 
     def get_replies(self):
-        return ["A sample reply"]
+        return [s.text for s in self.api.GetReplies()]
 
     def get_updates(self):
-        return ["A sample update"]
+        return [s.text for s in self.api.GetFriendsTimeline()]
 
 if __name__ == "__main__":
-    UI(Twitter('', ''))
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option('-u', '--username', help='log in as UNAME',
+                metavar='UNAME')
+    parser.add_option('-p', '--password', help='use password PW',
+                metavar='PW')
+    options, args = parser.parse_args()
+    if not options.username or not options.password:
+        parser.error("Error: must give username and password")
+    UI(Twitter(options.username, options.password))
