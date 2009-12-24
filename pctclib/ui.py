@@ -49,8 +49,10 @@ class UI(object):
     def change_focus(self):
         if self.focussed == 'footer':
             self.frame.set_focus('body')
+            self.focussed = 'body'
         elif self.focussed == 'body':
             self.frame.set_focus('footer')
+            self.focussed = 'footer'
 
     def post(self):
         edit = self.footer.original_widget
