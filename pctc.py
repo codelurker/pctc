@@ -11,7 +11,7 @@ class UI(object):
         ]
 
     def __init__(self, twitobj):
-        header = urwid.Text(('header', "Welcome to PCTC"))
+        header = urwid.AttrMap(urwid.Text("Welcome to PCTC"), 'header')
 
         replies = self._wrap_statuses(twitobj.get_replies())
         updates = self._wrap_statuses(twitobj.get_updates())
