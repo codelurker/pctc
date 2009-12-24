@@ -7,6 +7,7 @@ class UI(object):
             ('header', 'light green', 'dark blue'),
             ('footer', 'header'),
             ('bg', 'white', 'dark gray'),
+            ('in focus', 'dark gray', 'white'),
         ]
 
     def __init__(self, twitobj):
@@ -34,7 +35,9 @@ class UI(object):
 
     def _wrap_statuses(self, statuses):
         textlist = map(urwid.Text, statuses)
-        walker = urwid.SimpleListWalker(textlist)
+        walker = urwid.SimpleListWalker([
+                urwid.AttrMap(w, None, 'in focus') for w in textlist
+            ])
         return urwid.ListBox(walker)
 
     def handle(self, keys):
@@ -65,5 +68,7 @@ class UI(object):
     def refresh(self):
         for category in ('replies', 'updates'):
             walker = getattr(self, category).body
-            walker[:] = map(urwid.Text, getattr(self.twitobj, 'get_%s' %
-                                        category)())
+            statuses = getattr(self.twitobj, 'get_%s' % category)()
+            statuses = map(urwid.Text, statuses)
+            statuses = [urwid.AttrMap(s, None, ('in focus')) for s in statuses]
+            walker[:] = statuses
