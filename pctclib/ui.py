@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # pctc: python curses twitter client
 
 import urwid
