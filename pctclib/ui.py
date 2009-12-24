@@ -45,6 +45,8 @@ class UI(object):
         if keys == 'enter':
             self.post()
             return
+        if keys == 'f5':
+            self.refresh()
 
     def change_focus(self):
         if self.focussed == 'footer':
@@ -60,3 +62,9 @@ class UI(object):
         edit.set_edit_text('')
         if len(text) < 140:
             self.twitobj.post(text)
+
+    def refresh(self):
+        for category in ('replies', 'updates'):
+            walker = getattr(self, category).body
+            walker[:] = map(urwid.Text, getattr(self.twitobj, 'get_%s' %
+                                        category)())
