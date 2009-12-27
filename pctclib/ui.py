@@ -30,7 +30,7 @@ class UI(object):
 
         self.footer = urwid.AttrMap(urwid.Edit("Tweet: "), 'footer')
 
-        self.frame = urwid.Frame(columns, header, self.footer, focus_part='footer')
+        self.frame = urwid.Frame(self.columns, header, self.footer, focus_part='footer')
         self.focussed = 'footer'
         wrapped = urwid.AttrMap(self.frame, 'bg')
         loop = urwid.MainLoop(wrapped, UI.palette, unhandled_input=self.handle)
