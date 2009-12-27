@@ -26,7 +26,7 @@ class UI(object):
 
         self.replies = self._wrap_statuses(twitobj.get_replies())
         self.updates = self._wrap_statuses(twitobj.get_updates())
-        columns = urwid.Columns([self.updates, self.replies], dividechars=2)
+        self.columns = urwid.Columns([self.updates, self.replies], dividechars=2)
 
         self.footer = urwid.AttrMap(urwid.Edit("Tweet: "), 'footer')
 
@@ -56,6 +56,10 @@ class UI(object):
             return
         if keys == 'f5':
             self.refresh()
+            return
+        if keys == "home" or keys == "end":
+            self.scroll(keys)
+            return
 
     def change_focus(self):
         if self.focussed == 'footer':
@@ -79,3 +83,10 @@ class UI(object):
             statuses = map(urwid.Text, statuses)
             statuses = [urwid.AttrMap(s, None, ('in focus')) for s in statuses]
             walker[:] = statuses
+
+    def scroll(self, key):
+        widget = self.columns.get_focus()
+        if key == "home":
+            widget.set_focus(0)
+        elif key == "end":
+            widget.set_focus(len(widget.body))
