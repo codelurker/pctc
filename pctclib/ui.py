@@ -48,18 +48,17 @@ class UI(object):
         return urwid.ListBox(walker)
 
     def handle(self, keys):
-        if keys == 'tab':
-            self.change_focus()
-            return
-        if keys == 'enter':
-            self.post()
-            return
-        if keys == 'f5':
-            self.refresh()
-            return
-        if keys == "home" or keys == "end":
-            self.scroll(keys)
-            return
+        methdict = {
+                'tab'   : self.change_focus,
+                'enter' : self.post,
+                'f5'    : self.refresh,
+                'home'  : lambda: self.scroll('home'),
+                'end'   : lambda: self.scroll('end'),
+            }
+        try:
+            methdict[keys]()
+        except KeyError:
+            pass
 
     def change_focus(self):
         if self.focussed == 'footer':
