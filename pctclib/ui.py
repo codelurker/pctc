@@ -2,6 +2,13 @@
 
 import urwid
 
+class Tweet(urwid.Text):
+    def selectable(self):
+        return True
+
+    def keypress(self, size, key):
+        return key
+
 class UI(object):
     palette = [
             ('header', 'light green', 'dark blue'),
@@ -34,7 +41,7 @@ class UI(object):
             raise urwid.ExitMainLoop
 
     def _wrap_statuses(self, statuses):
-        textlist = map(urwid.Text, statuses)
+        textlist = map(Tweet, statuses)
         walker = urwid.SimpleListWalker([
                 urwid.AttrMap(w, None, 'in focus') for w in textlist
             ])
