@@ -1,6 +1,7 @@
 # pctc: python curses twitter client
 
 import urwid
+import re
 
 class Tweet(urwid.Text):
     def selectable(self):
@@ -54,6 +55,7 @@ class UI(object):
                 'f5'    : self.refresh,
                 'home'  : lambda: self.scroll('home'),
                 'end'   : lambda: self.scroll('end'),
+                'r'     : self.reply,
             }
         try:
             methdict[keys]()
@@ -89,3 +91,13 @@ class UI(object):
             widget.set_focus(0)
         elif key == "end":
             widget.set_focus(len(widget.body))
+
+    def reply(self):
+        listbox = self.columns.get_focus()
+        tweet, pos = listbox.get_focus()
+        tweettext = tweet.original_widget.text
+        edit = self.footer.original_widget
+        matches = re.findall(r'@\w+', tweettext)
+        edit.insert_text(matches[-1])
+        edit.insert_text(' ')
+        self.frame.set_focus('footer')
