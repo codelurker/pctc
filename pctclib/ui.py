@@ -35,6 +35,7 @@ class UI(object):
         self.focussed = 'footer'
         wrapped = urwid.AttrMap(self.frame, 'bg')
         loop = urwid.MainLoop(wrapped, UI.palette, unhandled_input=self.handle)
+        loop.set_alarm_in(300, self.wrapped_refresh)
         try:
             loop.run()
         except KeyboardInterrupt:
@@ -101,3 +102,7 @@ class UI(object):
         edit.insert_text(matches[-1])
         edit.insert_text(' ')
         self.frame.set_focus('footer')
+
+    def wrapped_refresh(self, loop, *args):
+        self.refresh()
+        loop.set_alarm_in(300, self.wrapped_refresh)
