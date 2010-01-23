@@ -12,7 +12,7 @@ parser.add_option('-p', '--password', help='use password PW',
 options, args = parser.parse_args()
 if not options.username or not options.password:
     try:
-        username, password = config.username, config.password
+        username, password = config.settings.username, config.settings.password
     except AttributeError:
         parser.error("must give username and password")
 else:

@@ -6,11 +6,16 @@ import os.path
 
 fnames = ['/etc/pctcrc', os.path.expanduser('~/.pctcrc')]
 
+# object to hold attributes reflecting the settings
+class Settings(object):
+    pass
+settings = Settings()
+
 class ConfigWalker(ast.NodeVisitor):
     def visit_Assign(self, node):
         target = node.targets[0].id
         value = node.value.s
-        setattr(sys.modules[__name__], target, value)
+        setattr(settings, target, value)
 
 walker = ConfigWalker()
 
