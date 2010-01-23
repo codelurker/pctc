@@ -1,29 +1,21 @@
 # pctc.py: python curses twitter client
 
-import ConfigParser
+import sys
+import ast
 import os.path
 
-class Config(object):
-    config = ConfigParser.SafeConfigParser()
+fnames = ['/etc/pctcrc', os.path.expanduser('~/.pctcrc')]
 
-    def __init__(self, *files):
-        self.files = []
-        for fname in files:
-            try:
-                self.files.append(open(fname))
-            except IOError:
-                continue
-        for fp in self.files:
-            config.readfp(fp)
+class ConfigWalker(ast.NodeVisitor):
+    def visit_Assign(self, node):
+        target = node.targets[0].id
+        value = node.value.s
+        setattr(sys.modules[__name__], target, value)
 
-    def __getattr__(self, attr):
-        try:
-            return config.get('pctc', attr)
-        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-            return ""
+walker = ConfigWalker()
 
-    def __setattr__(self, attr, val):
-        config.set('pctc', attr, val)
-        config.write(self.files[-1])
-
-sys.modules[__name__] = Config('/etc/pctcrc', os.path.expanduser('~/.pctcrc'))
+for fname in fnames:
+    if not os.path.exists(fname):
+        continue
+    with open(fname) as f:
+        walker.visit(ast.parse(f.read(), fname))
