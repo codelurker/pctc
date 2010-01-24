@@ -19,8 +19,12 @@ class ConfigWalker(ast.NodeVisitor):
 
 walker = ConfigWalker()
 
+def read(filename):
+    try:
+        with open(filename) as f:
+            walker.visit(ast.parse(f.read(), filename))
+    except IOError:
+        pass
+
 for fname in fnames:
-    if not os.path.exists(fname):
-        continue
-    with open(fname) as f:
-        walker.visit(ast.parse(f.read(), fname))
+    read(fname)
