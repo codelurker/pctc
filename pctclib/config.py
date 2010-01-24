@@ -26,5 +26,8 @@ def read(filename):
     except IOError:
         pass
 
-for fname in fnames:
-    read(fname)
+def read_files(filenames):
+    for name in filenames:
+        read(name)
+
+read_files(fnames)
