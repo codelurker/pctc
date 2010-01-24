@@ -20,7 +20,6 @@ Variables:
 """
 
 
-import sys
 import ast
 import os.path
 
